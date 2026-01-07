@@ -9,8 +9,6 @@ import com.aaditx23.phtask.domain.repository.ICourseRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -21,38 +19,12 @@ class CourseRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ICourseRepository {
 
-    override fun getCourses(): Flow<Result<List<Course>>> = flow {
-        val cachedCourses = courseDao.getAllCourses()
-            .map { entities -> entities.map { it.toDomain() } }
-            .firstOrNull() ?: emptyList()
-
-        if (cachedCourses.isNotEmpty()) {
-            emit(Result.success(cachedCourses))
-        }
-
-        try {
-            val networkResult = apiService.getAllCourses()
-
-            networkResult.fold(
-                onSuccess = { dtoList ->
-                    val entities = dtoList.map { it.toEntity() }
-                    courseDao.insertCourses(entities)
-
-                    val freshCourses = entities.map { it.toDomain() }
-                    emit(Result.success(freshCourses))
-                },
-                onFailure = { error ->
-                    if (cachedCourses.isEmpty()) {
-                        emit(Result.failure(error))
-                    }
-                }
-            )
-        } catch (e: Exception) {
-            if (cachedCourses.isEmpty()) {
-                emit(Result.failure(e))
+    override fun getCourses(): Flow<Result<List<Course>>> =
+        courseDao.getAllCourses()
+            .map { entities ->
+                Result.success(entities.map { it.toDomain() })
             }
-        }
-    }.flowOn(ioDispatcher)
+            .flowOn(ioDispatcher)
 
     override fun searchCourses(query: String): Flow<List<Course>> {
         return courseDao.searchCourses(query)
@@ -82,7 +54,6 @@ class CourseRepositoryImpl(
             networkResult.fold(
                 onSuccess = { dtoList ->
                     val entities = dtoList.map { it.toEntity() }
-                    courseDao.deleteAll()
                     courseDao.insertCourses(entities)
                     Result.success(Unit)
                 },

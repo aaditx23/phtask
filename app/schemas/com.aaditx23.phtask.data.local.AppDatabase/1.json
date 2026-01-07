@@ -2,15 +2,15 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "b0025499d14d7fe269ea896c0b16d46d",
+    "identityHash": "719624456d6690daf850ceb1ecdbe91d",
     "entities": [
       {
         "tableName": "courses",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`courseId` TEXT NOT NULL, `title` TEXT NOT NULL, `descriptionShort` TEXT NOT NULL, `durationWeeks` INTEGER NOT NULL, `priceUsd` REAL NOT NULL, `isPremium` INTEGER NOT NULL, `tags` TEXT NOT NULL, `rating` REAL NOT NULL, `isEnrolled` INTEGER NOT NULL, `instructor_name` TEXT NOT NULL, `instructor_expertise_level` TEXT NOT NULL, PRIMARY KEY(`courseId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`course_id` TEXT NOT NULL, `title` TEXT NOT NULL, `description_short` TEXT NOT NULL, `duration_weeks` INTEGER NOT NULL, `price_usd` REAL NOT NULL, `is_premium` INTEGER NOT NULL, `tags` TEXT NOT NULL, `rating` REAL NOT NULL, `is_enrolled` INTEGER NOT NULL, `instructor_name` TEXT NOT NULL, `instructor_expertise_level` TEXT NOT NULL, PRIMARY KEY(`course_id`))",
         "fields": [
           {
             "fieldPath": "courseId",
-            "columnName": "courseId",
+            "columnName": "course_id",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -22,25 +22,25 @@
           },
           {
             "fieldPath": "descriptionShort",
-            "columnName": "descriptionShort",
+            "columnName": "description_short",
             "affinity": "TEXT",
             "notNull": true
           },
           {
             "fieldPath": "durationWeeks",
-            "columnName": "durationWeeks",
+            "columnName": "duration_weeks",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
             "fieldPath": "priceUsd",
-            "columnName": "priceUsd",
+            "columnName": "price_usd",
             "affinity": "REAL",
             "notNull": true
           },
           {
             "fieldPath": "isPremium",
-            "columnName": "isPremium",
+            "columnName": "is_premium",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -58,7 +58,7 @@
           },
           {
             "fieldPath": "isEnrolled",
-            "columnName": "isEnrolled",
+            "columnName": "is_enrolled",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -78,14 +78,14 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "courseId"
+            "course_id"
           ]
         }
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b0025499d14d7fe269ea896c0b16d46d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '719624456d6690daf850ceb1ecdbe91d')"
     ]
   }
 }

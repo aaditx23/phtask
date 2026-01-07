@@ -13,7 +13,7 @@ interface CourseDao {
     @Query("SELECT * FROM courses ORDER BY title ASC")
     fun getAllCourses(): Flow<List<CourseEntity>>
 
-    @Query("SELECT * FROM courses WHERE courseId = :courseId")
+    @Query("SELECT * FROM courses WHERE course_id = :courseId")
     fun getCourseById(courseId: String): Flow<CourseEntity?>
 
     @Query("""
