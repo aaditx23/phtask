@@ -1,5 +1,6 @@
 package com.aaditx23.phtask.data.local.Course.Entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -7,16 +8,22 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "courses")
 data class CourseEntity (
     @PrimaryKey
+    @ColumnInfo(name = "course_id")
     val courseId: String,
     val title: String,
+    @ColumnInfo(name = "description_short")
     val descriptionShort: String,
     @Embedded(prefix = "instructor_")
     val instructor: Instructor,
+    @ColumnInfo(name = "duration_weeks")
     val durationWeeks: Int,
+    @ColumnInfo(name = "price_usd")
     val priceUsd: Double,
+    @ColumnInfo(name = "is_premium")
     val isPremium: Boolean,
     val tags: List<String>,
     val rating: Double,
+    @ColumnInfo(name = "is_enrolled")
     val isEnrolled: Boolean = false
 )
 

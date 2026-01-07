@@ -10,15 +10,29 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CourseDao {
 
-    @Query("SELECT * FROM courses")
+    @Query("SELECT * FROM courses ORDER BY title ASC")
     fun getAllCourses(): Flow<List<CourseEntity>>
 
     @Query("SELECT * FROM courses WHERE courseId = :courseId")
-    suspend fun getCourseById(courseId: String): CourseEntity?
+    fun getCourseById(courseId: String): Flow<CourseEntity?>
 
-    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
+    @Query("""
+        SELECT * FROM courses 
+        WHERE title LIKE '%' || :query || '%' 
+           OR tags LIKE '%' || :query || '%'
+        ORDER BY title ASC
+    """)
+    fun searchCourses(query: String): Flow<List<CourseEntity>>
+
+    @Query("UPDATE courses SET is_enrolled = :isEnrolled WHERE course_id = :courseId")
+    suspend fun updateEnrollmentStatus(courseId: String, isEnrolled: Boolean)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCourse(course: CourseEntity)
 
-    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCourses(courses: List<CourseEntity>)
+
+    @Query("DELETE FROM courses")
+    suspend fun deleteAll()
 }
