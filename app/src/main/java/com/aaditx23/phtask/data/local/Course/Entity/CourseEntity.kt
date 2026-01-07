@@ -16,7 +16,8 @@ data class CourseEntity (
     val priceUsd: Double,
     val isPremium: Boolean,
     val tags: List<String>,
-    val rating: Double
+    val rating: Double,
+    val isEnrolled: Boolean = false
 )
 
 /*

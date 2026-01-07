@@ -18,8 +18,16 @@ android {
     compileSdk {
         version = release(36)
     }
+    buildFeatures{
+        buildConfig = true
+    }
 
     defaultConfig {
+        buildConfigField(
+            type = "String",
+            name = "BASE_URL",
+            value = "\"https://mp684859b115658bb0d9.free.beeceptor.com\""
+        )
         applicationId = "com.aaditx23.phtask"
         minSdk = 31
         targetSdk = 36
@@ -31,10 +39,22 @@ android {
 
     buildTypes {
         release {
+            buildConfigField(
+                type = "String",
+                name = "BASE_URL",
+                value = "\"https://mp684859b115658bb0d9.free.beeceptor.com\""
+            )
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
+            )
+        }
+        debug {
+            buildConfigField(
+                type = "String",
+                name = "BASE_URL",
+                value = "\"https://mp684859b115658bb0d9.free.beeceptor.com\""
             )
         }
     }
@@ -77,7 +97,7 @@ dependencies {
 
     implementation(libs.koin.android)
     implementation(libs.koin.core)
-    implementation(libs.koin.compose)
+    implementation(libs.koin.androidx.compose)
 
     implementation(libs.androidx.navigation.compose)
 

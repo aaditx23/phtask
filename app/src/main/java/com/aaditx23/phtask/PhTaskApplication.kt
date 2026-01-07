@@ -1,6 +1,7 @@
 package com.aaditx23.phtask
 
 import android.app.Application
+import com.aaditx23.phtask.di.appModule
 import com.aaditx23.phtask.di.databaseModule
 import com.aaditx23.phtask.di.networkModule
 import org.koin.android.ext.koin.androidContext
@@ -12,7 +13,7 @@ class PhTaskApplication: Application() {
 
         startKoin {
             androidContext(this@PhTaskApplication)
-            modules(databaseModule, networkModule)
+            modules(databaseModule, networkModule, appModule)
         }
     }
 }

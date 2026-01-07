@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "26e4cfc260c50dc9fba303637437f403",
+    "identityHash": "b0025499d14d7fe269ea896c0b16d46d",
     "entities": [
       {
         "tableName": "courses",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`courseId` TEXT NOT NULL, `title` TEXT NOT NULL, `descriptionShort` TEXT NOT NULL, `durationWeeks` INTEGER NOT NULL, `priceUsd` REAL NOT NULL, `isPremium` INTEGER NOT NULL, `tags` TEXT NOT NULL, `rating` REAL NOT NULL, `instructor_name` TEXT NOT NULL, `instructor_expertise_level` TEXT NOT NULL, PRIMARY KEY(`courseId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`courseId` TEXT NOT NULL, `title` TEXT NOT NULL, `descriptionShort` TEXT NOT NULL, `durationWeeks` INTEGER NOT NULL, `priceUsd` REAL NOT NULL, `isPremium` INTEGER NOT NULL, `tags` TEXT NOT NULL, `rating` REAL NOT NULL, `isEnrolled` INTEGER NOT NULL, `instructor_name` TEXT NOT NULL, `instructor_expertise_level` TEXT NOT NULL, PRIMARY KEY(`courseId`))",
         "fields": [
           {
             "fieldPath": "courseId",
@@ -57,6 +57,12 @@
             "notNull": true
           },
           {
+            "fieldPath": "isEnrolled",
+            "columnName": "isEnrolled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
             "fieldPath": "instructor.name",
             "columnName": "instructor_name",
             "affinity": "TEXT",
@@ -79,7 +85,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '26e4cfc260c50dc9fba303637437f403')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b0025499d14d7fe269ea896c0b16d46d')"
     ]
   }
 }
