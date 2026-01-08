@@ -40,7 +40,6 @@ fun CourseListScreen(
     var courseToEnroll by remember { mutableStateOf<Course?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Handle enrollment events
     LaunchedEffect(Unit) {
         viewModel.enrollmentEvent.collect { event ->
             when (event) {
@@ -102,7 +101,6 @@ fun CourseListScreen(
         }
     }
 
-    // Confirmation Dialog
     courseToEnroll?.let { course ->
         ConfirmationDialog(
             title = "Enroll in Course",

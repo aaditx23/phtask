@@ -106,7 +106,6 @@ fun CourseCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Tags section with "See More" button
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -134,7 +133,6 @@ fun CourseCard(
                     }
                 }
 
-                // Show "See More" button if there are more than 3 tags
                 if (course.tags.size > 3) {
                     IconButton(
                         onClick = { showTagsDialog = true }
@@ -186,12 +184,12 @@ fun CourseCard(
                 )
             }
 
-            // Enroll button
             if (!course.isEnrolled && onEnrollClick != null) {
                 Spacer(modifier = Modifier.height(12.dp))
                 FilledTonalButton(
                     onClick = { onEnrollClick(course) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
@@ -204,7 +202,6 @@ fun CourseCard(
         }
     }
 
-    // Tags Dialog
     if (showTagsDialog) {
         TagsDialog(
             tags = course.tags,

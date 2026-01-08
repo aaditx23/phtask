@@ -13,6 +13,8 @@ interface ICourseRepository {
 
     suspend fun enrollInCourse(courseId: String): Result<Unit>
 
+    suspend fun unenrollFromCourse(courseId: String): Result<Unit>
+
     suspend fun refreshCourses(): Result<Unit>
 }
 

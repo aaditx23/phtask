@@ -47,6 +47,15 @@ class CourseRepositoryImpl(
         }
     }
 
+    override suspend fun unenrollFromCourse(courseId: String): Result<Unit> = withContext(ioDispatcher) {
+        try {
+            courseDao.updateEnrollmentStatus(courseId, false)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override suspend fun refreshCourses(): Result<Unit> = withContext(ioDispatcher) {
         try {
             val networkResult = apiService.getAllCourses()
