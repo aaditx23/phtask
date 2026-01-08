@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.aaditx23.phtask.data.local.Course.Entity.CourseEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -15,6 +16,9 @@ interface CourseDao {
 
     @Query("SELECT * FROM courses WHERE course_id = :courseId")
     fun getCourseById(courseId: String): Flow<CourseEntity?>
+
+    @Query("SELECT * FROM courses WHERE course_id = :courseId")
+    suspend fun getCourseByIdSync(courseId: String): CourseEntity?
 
     @Query("""
         SELECT * FROM courses 
@@ -33,6 +37,20 @@ interface CourseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCourses(courses: List<CourseEntity>)
 
+    @Transaction
+    suspend fun upsertCourses(courses: List<CourseEntity>) {
+        courses.forEach { newCourse ->
+            val existingCourse = getCourseByIdSync(newCourse.courseId)
+
+            if (existingCourse != null) {
+                // Preserve enrollment status from existing course
+                insertCourse(newCourse.copy(isEnrolled = existingCourse.isEnrolled))
+            } else {
+                // New course, use default (false)
+                insertCourse(newCourse)
+            }
+        }
+    }
     @Query("DELETE FROM courses")
     suspend fun deleteAll()
 }

@@ -3,20 +3,21 @@ package com.aaditx23.phtask.presentation.screens.CourseList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aaditx23.phtask.domain.repository.ICourseRepository
+import com.aaditx23.phtask.domain.usecase.EnrollCourseUseCase
 import com.aaditx23.phtask.domain.usecase.GetCoursesUseCase
 import com.aaditx23.phtask.domain.usecase.SearchCoursesUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -24,6 +25,7 @@ import kotlinx.coroutines.launch
 class CourseListViewModel(
     private val getCoursesUseCase: GetCoursesUseCase,
     private val searchCoursesUseCase: SearchCoursesUseCase,
+    private val enrollCourseUseCase: EnrollCourseUseCase,
     private val repository: ICourseRepository
 ) : ViewModel() {
 
@@ -31,6 +33,12 @@ class CourseListViewModel(
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
     private val _isRefreshing = MutableStateFlow(false)
+
+    private val _enrollmentEvent = Channel<EnrollmentEvent>(Channel.BUFFERED)
+    val enrollmentEvent = _enrollmentEvent.receiveAsFlow()
+
+    private val _isEnrolling = MutableStateFlow(false)
+    val isEnrolling: StateFlow<Boolean> = _isEnrolling.asStateFlow()
 
     private val coursesFlow = searchQuery
 //        .debounce(300)
@@ -79,6 +87,24 @@ class CourseListViewModel(
 
     fun clearSearch() {
         _searchQuery.value = ""
+    }
+
+    fun enrollInCourse(courseId: String) {
+        viewModelScope.launch {
+            _isEnrolling.value = true
+            enrollCourseUseCase(courseId)
+                .onSuccess {
+                    _enrollmentEvent.send(EnrollmentEvent.Success)
+                }
+                .onFailure { error ->
+                    _enrollmentEvent.send(
+                        EnrollmentEvent.Error(
+                            error.message ?: "Failed to enroll in course"
+                        )
+                    )
+                }
+            _isEnrolling.value = false
+        }
     }
 }
 

@@ -54,7 +54,7 @@ class CourseRepositoryImpl(
             networkResult.fold(
                 onSuccess = { dtoList ->
                     val entities = dtoList.map { it.toEntity() }
-                    courseDao.insertCourses(entities)
+                    courseDao.upsertCourses(entities)
                     Result.success(Unit)
                 },
                 onFailure = { error ->

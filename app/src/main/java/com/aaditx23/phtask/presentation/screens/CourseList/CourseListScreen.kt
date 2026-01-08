@@ -6,12 +6,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.aaditx23.phtask.domain.model.Course
+import com.aaditx23.phtask.presentation.components.ConfirmationDialog
 import com.aaditx23.phtask.presentation.components.CourseCard
 import com.aaditx23.phtask.presentation.components.EmptyState
 import com.aaditx23.phtask.presentation.components.ErrorMessage
@@ -29,6 +37,29 @@ fun CourseListScreen(
     val uiState by viewModel.uiState.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
 
+    var courseToEnroll by remember { mutableStateOf<Course?>(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Handle enrollment events
+    LaunchedEffect(Unit) {
+        viewModel.enrollmentEvent.collect { event ->
+            when (event) {
+                is EnrollmentEvent.Success -> {
+                    snackbarHostState.showSnackbar(
+                        message = "Successfully enrolled in course!",
+                        duration = SnackbarDuration.Short
+                    )
+                }
+                is EnrollmentEvent.Error -> {
+                    snackbarHostState.showSnackbar(
+                        message = event.message,
+                        duration = SnackbarDuration.Long
+                    )
+                }
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -40,7 +71,8 @@ fun CourseListScreen(
                     }
                 }
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         when (val state = uiState) {
             is CourseListUiState.Loading -> {
@@ -54,6 +86,9 @@ fun CourseListScreen(
                     onSearchQueryChange = viewModel::onSearchQueryChanged,
                     onClearSearch = viewModel::clearSearch,
                     onCourseClick = onCourseClick,
+                    onEnrollClick = { course ->
+                        courseToEnroll = course
+                    },
                     paddingValues = paddingValues
                 )
             }
@@ -66,6 +101,22 @@ fun CourseListScreen(
             }
         }
     }
+
+    // Confirmation Dialog
+    courseToEnroll?.let { course ->
+        ConfirmationDialog(
+            title = "Enroll in Course",
+            message = "Do you want to enroll in \"${course.title}\"?",
+            confirmButtonText = "Enroll",
+            onConfirm = {
+                viewModel.enrollInCourse(course.courseId)
+                courseToEnroll = null
+            },
+            onDismiss = {
+                courseToEnroll = null
+            }
+        )
+    }
 }
 
 @Composable
@@ -75,6 +126,7 @@ private fun CourseListContent(
     onSearchQueryChange: (String) -> Unit,
     onClearSearch: () -> Unit,
     onCourseClick: (Course) -> Unit,
+    onEnrollClick: (Course) -> Unit,
     paddingValues: PaddingValues
 ) {
     LazyColumn(
@@ -109,6 +161,7 @@ private fun CourseListContent(
                 CourseCard(
                     course = course,
                     onClick = onCourseClick,
+                    onEnrollClick = onEnrollClick,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
             }

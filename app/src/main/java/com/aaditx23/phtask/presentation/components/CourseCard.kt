@@ -13,16 +13,24 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -35,8 +43,11 @@ import com.aaditx23.phtask.domain.model.Course
 fun CourseCard(
     course: Course,
     onClick: (Course) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onEnrollClick: ((Course) -> Unit)? = null
 ) {
+    var showTagsDialog by remember { mutableStateOf(false) }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -95,24 +106,45 @@ fun CourseCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            FlowRow(
+            // Tags section with "See More" button
+            Row(
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                course.tags.take(3).forEach { tag ->
-                    AssistChip(
-                        onClick = { },
-                        label = {
-                            Text(
-                                text = tag,
-                                style = MaterialTheme.typography.labelSmall
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    course.tags.take(3).forEach { tag ->
+                        AssistChip(
+                            onClick = { },
+                            label = {
+                                Text(
+                                    text = tag,
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            },
+                            colors = AssistChipDefaults.assistChipColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                labelColor = MaterialTheme.colorScheme.onPrimaryContainer
                             )
-                        },
-                        colors = AssistChipDefaults.assistChipColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            labelColor = MaterialTheme.colorScheme.onPrimaryContainer
                         )
-                    )
+                    }
+                }
+
+                // Show "See More" button if there are more than 3 tags
+                if (course.tags.size > 3) {
+                    IconButton(
+                        onClick = { showTagsDialog = true }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.MoreHoriz,
+                            contentDescription = "See all tags",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
 
@@ -153,7 +185,31 @@ fun CourseCard(
                         MaterialTheme.colorScheme.secondary
                 )
             }
+
+            // Enroll button
+            if (!course.isEnrolled && onEnrollClick != null) {
+                Spacer(modifier = Modifier.height(12.dp))
+                FilledTonalButton(
+                    onClick = { onEnrollClick(course) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text("Enroll Now")
+                }
+            }
         }
+    }
+
+    // Tags Dialog
+    if (showTagsDialog) {
+        TagsDialog(
+            tags = course.tags,
+            onDismiss = { showTagsDialog = false }
+        )
     }
 }
 
