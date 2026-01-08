@@ -105,13 +105,17 @@ dependencies {
 
 
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
+    testImplementation(libs.mockk)
+    testImplementation(libs.ktor.client.mock)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.androidx.room.ktx)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-
-    testImplementation(libs.kotlinx.coroutines.test)  // ← ADD THIS
-    testImplementation(libs.turbine)
 }
