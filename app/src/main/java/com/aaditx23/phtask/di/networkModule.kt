@@ -1,6 +1,7 @@
 package com.aaditx23.phtask.di
 
 import com.aaditx23.phtask.BuildConfig
+import com.aaditx23.phtask.data.network.NetworkMonitor
 import com.aaditx23.phtask.data.repository.CourseRepositoryImpl
 import com.aaditx23.phtask.data.remote.service.CourseApiService
 import com.aaditx23.phtask.domain.repository.ICourseRepository
@@ -10,6 +11,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
@@ -44,5 +46,7 @@ val networkModule = module {
             ioDispatcher = Dispatchers.IO
         )
     }
+
+    single{ NetworkMonitor(androidContext()) }
 
 }

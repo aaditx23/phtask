@@ -20,13 +20,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.aaditx23.phtask.domain.model.Course
 import com.aaditx23.phtask.presentation.components.ConfirmationDialog
-import com.aaditx23.phtask.presentation.components.CourseCard
-import com.aaditx23.phtask.presentation.components.EmptyState
-import com.aaditx23.phtask.presentation.components.ErrorMessage
+import com.aaditx23.phtask.presentation.screens.CourseList.components.CourseCard
+import com.aaditx23.phtask.presentation.screens.CourseList.components.EmptyState
+import com.aaditx23.phtask.presentation.screens.CourseList.components.ErrorMessage
 import com.aaditx23.phtask.presentation.components.LoadingIndicator
-import com.aaditx23.phtask.presentation.components.TopAppBar
-import com.aaditx23.phtask.presentation.components.SearchBar
-import com.aaditx23.phtask.presentation.components.SmallLoadingIndicator
+import com.aaditx23.phtask.presentation.components.AppBarComponent
+import com.aaditx23.phtask.presentation.screens.CourseList.components.SearchBar
+import com.aaditx23.phtask.presentation.screens.CourseList.components.SyncStatusIcon
+import com.aaditx23.phtask.presentation.screens.CourseList.state.CourseListUiState
+import com.aaditx23.phtask.presentation.screens.CourseList.state.EnrollmentEvent
+import com.aaditx23.phtask.presentation.screens.CourseList.state.SyncStatus
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -59,14 +62,42 @@ fun CourseListScreen(
         }
     }
 
+    // Show snackbar for network status changes
+    LaunchedEffect(Unit) {
+        viewModel.uiState.collect { state ->
+            if (state is CourseListUiState.Success) {
+                when (state.syncStatus) {
+                    SyncStatus.DeviceOffline -> {
+                        snackbarHostState.showSnackbar(
+                            message = "Device offline. Showing cached data.",
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                    SyncStatus.NetworkError -> {
+                        snackbarHostState.showSnackbar(
+                            message = "Network error. Tap icon to retry.",
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                    else -> {}
+                }
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
-            TopAppBar(
+            AppBarComponent(
                 title = "Courses",
                 actions = {
-                    if (uiState is CourseListUiState.Success &&
-                        (uiState as CourseListUiState.Success).isRefreshing) {
-                        SmallLoadingIndicator()
+                    when (val state = uiState) {
+                        is CourseListUiState.Success -> {
+                            SyncStatusIcon(
+                                syncStatus = state.syncStatus,
+                                onRetryClick = { viewModel.onRetrySync() }
+                            )
+                        }
+                        else -> {}
                     }
                 }
             )

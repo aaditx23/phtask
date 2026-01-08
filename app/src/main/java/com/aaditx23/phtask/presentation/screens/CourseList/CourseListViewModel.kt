@@ -2,10 +2,14 @@ package com.aaditx23.phtask.presentation.screens.CourseList
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aaditx23.phtask.data.network.NetworkMonitor
 import com.aaditx23.phtask.domain.repository.ICourseRepository
 import com.aaditx23.phtask.domain.usecase.EnrollCourseUseCase
 import com.aaditx23.phtask.domain.usecase.GetCoursesUseCase
 import com.aaditx23.phtask.domain.usecase.SearchCoursesUseCase
+import com.aaditx23.phtask.presentation.screens.CourseList.state.CourseListUiState
+import com.aaditx23.phtask.presentation.screens.CourseList.state.EnrollmentEvent
+import com.aaditx23.phtask.presentation.screens.CourseList.state.SyncStatus
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -26,13 +30,14 @@ class CourseListViewModel(
     private val getCoursesUseCase: GetCoursesUseCase,
     private val searchCoursesUseCase: SearchCoursesUseCase,
     private val enrollCourseUseCase: EnrollCourseUseCase,
-    private val repository: ICourseRepository
+    private val repository: ICourseRepository,
+    private val networkMonitor: NetworkMonitor
 ) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
-    private val _isRefreshing = MutableStateFlow(false)
+    private val _syncStatus = MutableStateFlow(SyncStatus.Idle)
 
     private val _enrollmentEvent = Channel<EnrollmentEvent>(Channel.BUFFERED)
     val enrollmentEvent = _enrollmentEvent.receiveAsFlow()
@@ -60,9 +65,9 @@ class CourseListViewModel(
 
     val uiState: StateFlow<CourseListUiState> = combine(
         coursesFlow,
-        _isRefreshing
-    ) { courses, isRefreshing ->
-        CourseListUiState.Success(courses, isRefreshing)
+        _syncStatus
+    ) { courses, syncStatus ->
+        CourseListUiState.Success(courses, syncStatus)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -73,12 +78,28 @@ class CourseListViewModel(
         refreshCourses()
     }
 
-    private fun refreshCourses() {
+    fun refreshCourses() {
         viewModelScope.launch {
-            _isRefreshing.value = true
+            // Check network availability FIRST
+            if (!networkMonitor.isNetworkAvailable()) {
+                _syncStatus.value = SyncStatus.DeviceOffline
+                return@launch
+            }
+
+            _syncStatus.value = SyncStatus.Syncing
+
             repository.refreshCourses()
-            _isRefreshing.value = false
+                .onSuccess {
+                    _syncStatus.value = SyncStatus.Success
+                }
+                .onFailure { error ->
+                    _syncStatus.value = SyncStatus.NetworkError
+                }
         }
+    }
+
+    fun onRetrySync() {
+        refreshCourses()
     }
 
     fun onSearchQueryChanged(query: String) {

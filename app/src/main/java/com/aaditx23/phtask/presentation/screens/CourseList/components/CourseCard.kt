@@ -1,4 +1,4 @@
-package com.aaditx23.phtask.presentation.components
+package com.aaditx23.phtask.presentation.screens.CourseList.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

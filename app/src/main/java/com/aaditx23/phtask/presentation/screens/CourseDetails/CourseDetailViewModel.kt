@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.aaditx23.phtask.domain.usecase.EnrollCourseUseCase
 import com.aaditx23.phtask.domain.usecase.GetCourseByIdUseCase
 import com.aaditx23.phtask.domain.usecase.UnenrollCourseUseCase
+import com.aaditx23.phtask.presentation.screens.CourseDetails.state.CourseDetailUiState
+import com.aaditx23.phtask.presentation.screens.CourseDetails.state.EnrollmentEvent
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

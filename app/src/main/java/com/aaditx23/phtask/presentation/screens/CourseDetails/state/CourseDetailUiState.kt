@@ -1,4 +1,4 @@
-package com.aaditx23.phtask.presentation.screens.CourseDetails
+package com.aaditx23.phtask.presentation.screens.CourseDetails.state
 
 import com.aaditx23.phtask.domain.model.Course
 

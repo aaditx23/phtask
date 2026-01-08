@@ -14,7 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.aaditx23.phtask.presentation.components.ErrorMessage
+import com.aaditx23.phtask.presentation.screens.CourseList.components.ErrorMessage
 
 @Composable
 fun ErrorContent(
