@@ -19,6 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.aaditx23.phtask.domain.model.Course
+import com.aaditx23.phtask.presentation.components.DurationDisplay
+import com.aaditx23.phtask.presentation.components.RatingDisplay
 
 @Composable
 fun CourseDetailsContent(

@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlin.invoke
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 class CourseListViewModel(
@@ -37,13 +38,16 @@ class CourseListViewModel(
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
-    private val _syncStatus = MutableStateFlow(SyncStatus.Idle)
+    private val _syncStatus = MutableStateFlow<SyncStatus>(SyncStatus.Idle)
+    private val _isConnected = MutableStateFlow(true)
 
     private val _enrollmentEvent = Channel<EnrollmentEvent>(Channel.BUFFERED)
     val enrollmentEvent = _enrollmentEvent.receiveAsFlow()
 
     private val _isEnrolling = MutableStateFlow(false)
     val isEnrolling: StateFlow<Boolean> = _isEnrolling.asStateFlow()
+
+    private var lastFailedSync: (() -> Unit)? = null
 
     private val coursesFlow = searchQuery
 //        .debounce(300)
@@ -65,9 +69,10 @@ class CourseListViewModel(
 
     val uiState: StateFlow<CourseListUiState> = combine(
         coursesFlow,
-        _syncStatus
-    ) { courses, syncStatus ->
-        CourseListUiState.Success(courses, syncStatus)
+        _syncStatus,
+        _isConnected
+    ) { courses, syncStatus, isConnected ->
+        CourseListUiState.Success(courses, syncStatus, isConnected)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -75,14 +80,44 @@ class CourseListViewModel(
     )
 
     init {
+        observeNetworkChanges()
         refreshCourses()
     }
 
+    private fun observeNetworkChanges() {
+        viewModelScope.launch {
+            networkMonitor.observeNetworkState()
+                .collect { isConnected ->
+                    _isConnected.value = isConnected
+
+                    when {
+                        !isConnected -> {
+                            if (_syncStatus.value !is SyncStatus.Success) {
+                                _syncStatus.value = SyncStatus.DeviceOffline
+                            }
+                        }
+
+                        lastFailedSync != null -> {
+                            lastFailedSync?.invoke()
+                            lastFailedSync = null
+                        }
+
+                        _syncStatus.value is SyncStatus.DeviceOffline -> {
+                            refreshCourses()
+                        }
+                    }
+                }
+        }
+    }
+
+
+
     fun refreshCourses() {
         viewModelScope.launch {
-            // Check network availability FIRST
             if (!networkMonitor.isNetworkAvailable()) {
+                lastFailedSync = { refreshCourses() }
                 _syncStatus.value = SyncStatus.DeviceOffline
+                _isConnected.value = false
                 return@launch
             }
 
@@ -91,9 +126,15 @@ class CourseListViewModel(
             repository.refreshCourses()
                 .onSuccess {
                     _syncStatus.value = SyncStatus.Success
+//                    kotlinx.coroutines.delay(2000)
+//                    _syncStatus.value = SyncStatus.Idle
+                    lastFailedSync = null
                 }
                 .onFailure { error ->
-                    _syncStatus.value = SyncStatus.NetworkError
+                    lastFailedSync = { refreshCourses() }
+                    _syncStatus.value = SyncStatus.NetworkError(
+                        error.message ?: "Unknown error"
+                    )
                 }
         }
     }

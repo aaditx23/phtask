@@ -26,7 +26,7 @@ android {
         buildConfigField(
             type = "String",
             name = "BASE_URL",
-            value = "\"https://mp684859b115658bb0d9.free.beeceptor.com\""
+            value = "\"https://phtask.free.beeceptor.com\""
         )
         applicationId = "com.aaditx23.phtask"
         minSdk = 31
@@ -42,7 +42,7 @@ android {
             buildConfigField(
                 type = "String",
                 name = "BASE_URL",
-                value = "\"https://mp684859b115658bb0d9.free.beeceptor.com\""
+                value = "\"https://phtask.free.beeceptor.com\""
             )
             isMinifyEnabled = false
             proguardFiles(
@@ -54,7 +54,7 @@ android {
             buildConfigField(
                 type = "String",
                 name = "BASE_URL",
-                value = "\"https://mp684859b115658bb0d9.free.beeceptor.com\""
+                value = "\"https://phtask.free.beeceptor.com\""
             )
         }
     }
@@ -111,4 +111,7 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    testImplementation(libs.kotlinx.coroutines.test)  // ← ADD THIS
+    testImplementation(libs.turbine)
 }

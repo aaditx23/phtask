@@ -1,10 +1,10 @@
 package com.aaditx23.phtask.presentation.screens.CourseList.state
 
-enum class SyncStatus {
-    Idle,
-    Syncing,
-    Success,
-    NetworkError,
-    DeviceOffline
+sealed interface SyncStatus {
+    data object Idle : SyncStatus
+    data object Syncing : SyncStatus
+    data object Success : SyncStatus
+    data class NetworkError(val message: String) : SyncStatus
+    data object DeviceOffline : SyncStatus
 }
 

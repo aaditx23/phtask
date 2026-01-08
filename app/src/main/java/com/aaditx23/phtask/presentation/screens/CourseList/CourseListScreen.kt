@@ -1,6 +1,7 @@
 package com.aaditx23.phtask.presentation.screens.CourseList
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,6 +28,7 @@ import com.aaditx23.phtask.presentation.components.LoadingIndicator
 import com.aaditx23.phtask.presentation.components.AppBarComponent
 import com.aaditx23.phtask.presentation.screens.CourseList.components.SearchBar
 import com.aaditx23.phtask.presentation.screens.CourseList.components.SyncStatusIcon
+import com.aaditx23.phtask.presentation.screens.CourseList.components.NetworkStatusBanner
 import com.aaditx23.phtask.presentation.screens.CourseList.state.CourseListUiState
 import com.aaditx23.phtask.presentation.screens.CourseList.state.EnrollmentEvent
 import com.aaditx23.phtask.presentation.screens.CourseList.state.SyncStatus
@@ -66,16 +68,16 @@ fun CourseListScreen(
     LaunchedEffect(Unit) {
         viewModel.uiState.collect { state ->
             if (state is CourseListUiState.Success) {
-                when (state.syncStatus) {
-                    SyncStatus.DeviceOffline -> {
+                when (val syncStatus = state.syncStatus) {
+                    is SyncStatus.DeviceOffline -> {
                         snackbarHostState.showSnackbar(
-                            message = "Device offline. Showing cached data.",
+                            message = "Device offline. Will retry when online.",
                             duration = SnackbarDuration.Short
                         )
                     }
-                    SyncStatus.NetworkError -> {
+                    is SyncStatus.NetworkError -> {
                         snackbarHostState.showSnackbar(
-                            message = "Network error. Tap icon to retry.",
+                            message = "Network error: ${syncStatus.message}",
                             duration = SnackbarDuration.Short
                         )
                     }
@@ -104,31 +106,44 @@ fun CourseListScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
-        when (val state = uiState) {
-            is CourseListUiState.Loading -> {
-                LoadingIndicator(modifier = Modifier.padding(paddingValues))
+        Box(modifier = Modifier.fillMaxSize()) {
+            when (val state = uiState) {
+                is CourseListUiState.Loading -> {
+                    LoadingIndicator(modifier = Modifier.padding(paddingValues))
+                }
+
+                is CourseListUiState.Success -> {
+                    CourseListContent(
+                        courses = state.courses,
+                        searchQuery = searchQuery,
+                        onSearchQueryChange = viewModel::onSearchQueryChanged,
+                        onClearSearch = viewModel::clearSearch,
+                        onCourseClick = onCourseClick,
+                        onEnrollClick = { course ->
+                            courseToEnroll = course
+                        },
+                        paddingValues = paddingValues
+                    )
+                }
+
+                is CourseListUiState.Error -> {
+                    ErrorMessage(
+                        message = state.message,
+                        modifier = Modifier.padding(paddingValues)
+                    )
+                }
             }
 
-            is CourseListUiState.Success -> {
-                CourseListContent(
-                    courses = state.courses,
-                    searchQuery = searchQuery,
-                    onSearchQueryChange = viewModel::onSearchQueryChanged,
-                    onClearSearch = viewModel::clearSearch,
-                    onCourseClick = onCourseClick,
-                    onEnrollClick = { course ->
-                        courseToEnroll = course
-                    },
-                    paddingValues = paddingValues
-                )
-            }
-
-            is CourseListUiState.Error -> {
-                ErrorMessage(
-                    message = state.message,
-                    modifier = Modifier.padding(paddingValues)
-                )
-            }
+//            if (uiState is CourseListUiState.Success) {
+//                NetworkStatusBanner(
+//                    syncStatus = (uiState as CourseListUiState.Success).syncStatus,
+//                    isConnected = (uiState as CourseListUiState.Success).isConnected,
+//                    onRetry = { viewModel.onRetrySync() },
+//                    modifier = Modifier
+//                        .align(androidx.compose.ui.Alignment.TopCenter)
+//                        .padding(top = paddingValues.calculateTopPadding())
+//                )
+//            }
         }
     }
 

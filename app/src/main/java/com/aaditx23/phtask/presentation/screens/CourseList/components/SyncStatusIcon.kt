@@ -24,7 +24,7 @@ fun SyncStatusIcon(
     modifier: Modifier = Modifier
 ) {
     when (syncStatus) {
-        SyncStatus.Idle -> {
+        is SyncStatus.Idle -> {
             IconButton(onClick = onRetryClick) {
                 Icon(
                     imageVector = Icons.Filled.CloudSync,
@@ -34,7 +34,7 @@ fun SyncStatusIcon(
             }
         }
 
-        SyncStatus.Syncing -> {
+        is SyncStatus.Syncing -> {
             Box(modifier = modifier.padding(12.dp)) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
@@ -44,7 +44,7 @@ fun SyncStatusIcon(
             }
         }
 
-        SyncStatus.Success -> {
+        is SyncStatus.Success -> {
             IconButton(onClick = onRetryClick) {
                 Icon(
                     imageVector = Icons.Filled.CloudDone,
@@ -54,7 +54,7 @@ fun SyncStatusIcon(
             }
         }
 
-        SyncStatus.DeviceOffline -> {
+        is SyncStatus.DeviceOffline -> {
             IconButton(onClick = onRetryClick) {
                 Icon(
                     imageVector = Icons.Default.CloudOff,
@@ -64,7 +64,7 @@ fun SyncStatusIcon(
             }
         }
 
-        SyncStatus.NetworkError -> {
+        is SyncStatus.NetworkError -> {
             IconButton(onClick = onRetryClick) {
                 Icon(
                     imageVector = Icons.Default.ErrorOutline,

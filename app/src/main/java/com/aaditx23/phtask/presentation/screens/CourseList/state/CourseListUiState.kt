@@ -7,7 +7,8 @@ sealed interface CourseListUiState {
 
     data class Success(
         val courses: List<Course>,
-        val syncStatus: SyncStatus = SyncStatus.Idle
+        val syncStatus: SyncStatus = SyncStatus.Idle,
+        val isConnected: Boolean = true
     ) : CourseListUiState
 
     data class Error(
