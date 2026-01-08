@@ -81,6 +81,7 @@ fun CourseListScreen(
                             duration = SnackbarDuration.Short
                         )
                     }
+
                     else -> {}
                 }
             }
