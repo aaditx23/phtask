@@ -26,6 +26,11 @@ This project was assigned by **Programming Hero** as part of their Android Devel
 | ![Screenshot 07](screenshots/07.png) | ![Screenshot 08](screenshots/08.png) | ![Screenshot 09](screenshots/09.png) |
 
 
+|               Screenshot 10                |               Screenshot 11               |
+|:------------------------------------------:|:-----------------------------------------:|
+| ![Screenshot 010](screenshots/test_01.png) | ![Screenshot 11](screenshots/test_02.png) |
+
+
 ## 🎯 Key Features
 
 ### Core Functionality
@@ -38,7 +43,7 @@ This project was assigned by **Programming Hero** as part of their Android Devel
 - ✅ **Course Details** - Detailed view with instructor info, pricing, and ratings
 
 ### Technical Highlights
-- ✅ **Comprehensive Unit Tests** - Covering DAO, Repository, and ViewModel layers
+- ✅ **Comprehensive Unit and Instrumented Tests** - Covering DAO, Repository, and ViewModel layers
 - ✅ **MVVM + Clean Architecture** - Separation of concerns with clear layer boundaries
 - ✅ **Jetpack Compose UI** - Modern declarative UI with Material3 design
 - ✅ **Coroutines & Flow** - Reactive programming with proper lifecycle management
@@ -98,6 +103,16 @@ As a QA professional transitioning to Android development, I understand that **u
 - ✅ Regression prevention - Catch bugs before production
 - ✅ Documentation - Tests serve as living documentation
 - ✅ Code quality - Forces better architecture and testability
+
+## 🧪 Test Coverage
+
+### Unit Tests (32 tests)
+- **CourseListViewModelTest** - 15 tests covering state management, search, enrollment, and error handling
+- **CourseRepositoryImplTest** - 16 tests for repository operations, caching, and API integration
+- **CourseApiServiceTest** - 1 test for network layer data fetching
+
+### Instrumented Tests (24 tests)
+- **CourseDaoTest** - 24 tests for database operations, queries, enrollment, and upsert logic
 
 ## 🛠️ Tech Stack
 
@@ -228,7 +243,7 @@ All repository operations return Result types with proper error handling using t
 
 **Why This Project Stands Out:**
 - As a QA professional, I understand the critical importance of testable, maintainable code
-- 57 comprehensive tests demonstrate production-level quality assurance
+- Comprehensive tests demonstrate production-level quality assurance
 - Offline-first architecture shows understanding of real-world app requirements
 - Clean architecture ensures scalability and maintainability
 
